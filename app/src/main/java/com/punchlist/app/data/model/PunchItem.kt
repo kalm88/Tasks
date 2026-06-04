@@ -21,6 +21,7 @@ data class PunchItem(
     val photoUrls: List<String> = emptyList(),
     val completionPhotoUrls: List<String> = emptyList(),
     val commentCount: Int = 0,
+    val sku: String = "",
     val syncPending: Boolean = false
 ) {
     fun toFirestoreMap(): Map<String, Any?> = mapOf(
@@ -40,7 +41,8 @@ data class PunchItem(
         "dueDate" to dueDate,
         "photoUrls" to photoUrls,
         "completionPhotoUrls" to completionPhotoUrls,
-        "commentCount" to commentCount
+        "commentCount" to commentCount,
+        "sku" to sku
     )
 
     companion object {
@@ -63,7 +65,8 @@ data class PunchItem(
             dueDate = map["dueDate"] as? Timestamp,
             photoUrls = (map["photoUrls"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
             completionPhotoUrls = (map["completionPhotoUrls"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-            commentCount = (map["commentCount"] as? Long)?.toInt() ?: 0
+            commentCount = (map["commentCount"] as? Long)?.toInt() ?: 0,
+            sku = map["sku"] as? String ?: ""
         )
     }
 }

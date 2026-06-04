@@ -14,6 +14,7 @@ import com.punchlist.app.ui.detail.PunchItemDetailScreen
 import com.punchlist.app.ui.feed.PunchItemFeedScreen
 import com.punchlist.app.ui.project.CreateProjectScreen
 import com.punchlist.app.ui.project.ProjectListScreen
+import com.punchlist.app.ui.scanner.BarcodeScannerScreen
 
 @Composable
 fun AppNavGraph(
@@ -48,8 +49,8 @@ fun AppNavGraph(
 
         composable(NavRoutes.PROJECT_LIST) {
             ProjectListScreen(
-                onProjectSelected = { projectId ->
-                    navController.navigate(NavRoutes.punchItemFeed(projectId))
+                onProjectSelected = { projectId, projectName ->
+                    navController.navigate(NavRoutes.punchItemFeed(projectId, projectName))
                 },
                 onCreateProject = { navController.navigate(NavRoutes.CREATE_PROJECT) }
             )
@@ -57,8 +58,8 @@ fun AppNavGraph(
 
         composable(NavRoutes.CREATE_PROJECT) {
             CreateProjectScreen(
-                onProjectCreated = { projectId ->
-                    navController.navigate(NavRoutes.punchItemFeed(projectId)) {
+                onProjectCreated = { projectId, projectName ->
+                    navController.navigate(NavRoutes.punchItemFeed(projectId, projectName)) {
                         popUpTo(NavRoutes.PROJECT_LIST)
                     }
                 },
@@ -68,19 +69,20 @@ fun AppNavGraph(
 
         composable(
             route = NavRoutes.PUNCH_ITEM_FEED,
-            arguments = listOf(navArgument("projectId") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("projectId") { type = NavType.StringType },
+                navArgument("projectName") { type = NavType.StringType; defaultValue = "Project" }
+            )
         ) { backStack ->
             val projectId = backStack.arguments?.getString("projectId") ?: return@composable
+            val projectName = backStack.arguments?.getString("projectName") ?: "Project"
             PunchItemFeedScreen(
                 projectId = projectId,
                 onItemClick = { itemId ->
-                    navController.navigate(NavRoutes.punchItemDetail(projectId, itemId))
+                    navController.navigate(NavRoutes.punchItemDetail(projectId, itemId, projectName))
                 },
                 onNewItem = {
-                    // Camera-first: go to camera, which then hands off to create form
-                    navController.navigate(NavRoutes.punchItemFeed(projectId).let {
-                        NavRoutes.createPunchItem(projectId)
-                    })
+                    navController.navigate(NavRoutes.createPunchItem(projectId))
                 },
                 onBack = { navController.popBackStack() }
             )
@@ -97,6 +99,7 @@ fun AppNavGraph(
                     navController.popBackStack()
                 },
                 onOpenCamera = { navController.navigate(NavRoutes.CAMERA) },
+                onOpenScanner = { navController.navigate(NavRoutes.BARCODE_SCANNER) },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -104,10 +107,22 @@ fun AppNavGraph(
         composable(NavRoutes.CAMERA) {
             CameraScreen(
                 onPhotoTaken = { uri ->
-                    // Pass URI back to the create screen via SavedStateHandle
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("captured_photo_uri", uri.toString())
+                    navController.popBackStack()
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.BARCODE_SCANNER) {
+            BarcodeScannerScreen(
+                onScanned = { sku ->
+                    // Pass scanned SKU back to the calling screen via SavedStateHandle
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("scanned_sku", sku)
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() }
@@ -118,14 +133,17 @@ fun AppNavGraph(
             route = NavRoutes.PUNCH_ITEM_DETAIL,
             arguments = listOf(
                 navArgument("projectId") { type = NavType.StringType },
-                navArgument("itemId") { type = NavType.StringType }
+                navArgument("itemId") { type = NavType.StringType },
+                navArgument("projectName") { type = NavType.StringType; defaultValue = "Project" }
             )
         ) { backStack ->
             val projectId = backStack.arguments?.getString("projectId") ?: return@composable
             val itemId = backStack.arguments?.getString("itemId") ?: return@composable
+            val projectName = backStack.arguments?.getString("projectName") ?: "Project"
             PunchItemDetailScreen(
                 projectId = projectId,
                 itemId = itemId,
+                projectName = projectName,
                 onBack = { navController.popBackStack() },
                 onOpenCamera = { navController.navigate(NavRoutes.CAMERA) }
             )

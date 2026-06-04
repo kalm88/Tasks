@@ -15,7 +15,8 @@ import javax.inject.Inject
 data class CreateProjectUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val createdProjectId: String? = null
+    val createdProjectId: String? = null,
+    val createdProjectName: String = ""
 )
 
 @HiltViewModel
@@ -32,7 +33,7 @@ class CreateProjectViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = CreateProjectUiState(isLoading = true)
             when (val result = createProjectUseCase(name, description, uid)) {
-                is Result.Success -> _uiState.value = CreateProjectUiState(createdProjectId = result.data)
+                is Result.Success -> _uiState.value = CreateProjectUiState(createdProjectId = result.data, createdProjectName = name)
                 is Result.Error -> _uiState.value = CreateProjectUiState(error = result.message)
                 Result.Loading -> {}
             }

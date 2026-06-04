@@ -23,6 +23,7 @@ import javax.inject.Inject
 data class DetailUiState(
     val item: PunchItem? = null,
     val comments: List<Comment> = emptyList(),
+    val projectName: String = "",
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val error: String? = null
@@ -43,7 +44,8 @@ class PunchItemDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
-    fun load(projectId: String, itemId: String) {
+    fun load(projectId: String, itemId: String, projectName: String = "") {
+        _uiState.value = _uiState.value.copy(projectName = projectName)
         viewModelScope.launch {
             when (val result = getPunchItemDetailUseCase(projectId, itemId)) {
                 is Result.Success -> _uiState.value = _uiState.value.copy(item = result.data, isLoading = false)

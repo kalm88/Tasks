@@ -114,6 +114,9 @@ dependencies {
     implementation(libs.hilt.workmanager)
     kapt(libs.hilt.workmanager.compiler)
 
+    // ML Kit barcode scanning (used for SKU scanning)
+    implementation(libs.mlkit.barcode)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

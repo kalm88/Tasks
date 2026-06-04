@@ -24,7 +24,8 @@ class CreatePunchItemUseCase @Inject constructor(
         assignedToUserName: String,
         createdByUserId: String,
         createdByUserName: String,
-        localPhotoUris: List<Uri>
+        localPhotoUris: List<Uri>,
+        sku: String = ""
     ): Result<String> {
         if (title.isBlank()) return Result.Error("Title is required")
 
@@ -53,7 +54,8 @@ class CreatePunchItemUseCase @Inject constructor(
             assignedToUserName = assignedToUserName,
             createdByUserId = createdByUserId,
             createdByUserName = createdByUserName,
-            photoUrls = uploadedUrls
+            photoUrls = uploadedUrls,
+            sku = sku.trim()
         )
         return punchItemRepository.createPunchItem(item)
     }

@@ -24,7 +24,7 @@ import com.punchlist.app.util.toDisplayDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectListScreen(
-    onProjectSelected: (String) -> Unit,
+    onProjectSelected: (projectId: String, projectName: String) -> Unit,
     onCreateProject: () -> Unit,
     viewModel: ProjectListViewModel = hiltViewModel()
 ) {
@@ -106,7 +106,7 @@ fun ProjectListScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(state.projects) { project ->
-                            ProjectCard(project = project, onClick = { onProjectSelected(project.id) })
+                            ProjectCard(project = project, onClick = { onProjectSelected(project.id, project.name) })
                         }
                     }
                 }

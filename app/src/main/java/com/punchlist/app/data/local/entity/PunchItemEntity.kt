@@ -25,6 +25,7 @@ data class PunchItemEntity(
     val photoUrls: String, // JSON array stored as string
     val completionPhotoUrls: String,
     val commentCount: Int,
+    val sku: String = "",
     val syncPending: Boolean = false
 ) {
     fun toDomain(): PunchItem = PunchItem(
@@ -43,6 +44,7 @@ data class PunchItemEntity(
         photoUrls = photoUrls.split(",").filter { it.isNotEmpty() },
         completionPhotoUrls = completionPhotoUrls.split(",").filter { it.isNotEmpty() },
         commentCount = commentCount,
+        sku = sku,
         syncPending = syncPending
     )
 }
@@ -65,5 +67,6 @@ fun PunchItem.toEntity(): PunchItemEntity = PunchItemEntity(
     photoUrls = photoUrls.joinToString(","),
     completionPhotoUrls = completionPhotoUrls.joinToString(","),
     commentCount = commentCount,
+    sku = sku,
     syncPending = syncPending
 )

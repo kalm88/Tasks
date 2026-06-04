@@ -5,11 +5,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +23,7 @@ import com.punchlist.app.ui.components.CommentItem
 import com.punchlist.app.ui.components.PhotoGrid
 import com.punchlist.app.ui.components.PriorityChip
 import com.punchlist.app.ui.components.StatusChip
+import com.punchlist.app.util.PrintShareHelper
 import com.punchlist.app.util.toDisplayDate
 import com.punchlist.app.util.toRelativeString
 
@@ -27,16 +32,19 @@ import com.punchlist.app.util.toRelativeString
 fun PunchItemDetailScreen(
     projectId: String,
     itemId: String,
+    projectName: String = "",
     onBack: () -> Unit,
     onOpenCamera: () -> Unit,
     viewModel: PunchItemDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     var commentText by remember { mutableStateOf("") }
     var statusDropdownExpanded by remember { mutableStateOf(false) }
+    var shareMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(projectId, itemId) {
-        viewModel.load(projectId, itemId)
+        viewModel.load(projectId, itemId, projectName)
         viewModel.observeCompletionPhoto(projectId, itemId)
     }
 
@@ -47,6 +55,54 @@ fun PunchItemDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    // Print button
+                    IconButton(
+                        onClick = {
+                            uiState.item?.let { item ->
+                                PrintShareHelper.print(context, item, uiState.comments, uiState.projectName)
+                            }
+                        },
+                        enabled = uiState.item != null
+                    ) {
+                        Icon(Icons.Default.Print, contentDescription = "Print")
+                    }
+
+                    // Share dropdown
+                    Box {
+                        IconButton(
+                            onClick = { shareMenuExpanded = true },
+                            enabled = uiState.item != null
+                        ) {
+                            Icon(Icons.Default.Share, contentDescription = "Share")
+                        }
+                        DropdownMenu(
+                            expanded = shareMenuExpanded,
+                            onDismissRequest = { shareMenuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Share PDF") },
+                                leadingIcon = { Icon(Icons.Default.Share, contentDescription = null) },
+                                onClick = {
+                                    shareMenuExpanded = false
+                                    uiState.item?.let { item ->
+                                        PrintShareHelper.sharePdf(context, item, uiState.comments, uiState.projectName)
+                                    }
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Send via Email") },
+                                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                                onClick = {
+                                    shareMenuExpanded = false
+                                    uiState.item?.let { item ->
+                                        PrintShareHelper.shareViaEmail(context, item, uiState.comments, uiState.projectName)
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             )
@@ -155,6 +211,9 @@ fun PunchItemDetailScreen(
                         }
                         if (item.location.isNotBlank()) {
                             DetailRow(label = "Location", value = item.location)
+                        }
+                        if (item.sku.isNotBlank()) {
+                            DetailRow(label = "SKU", value = item.sku)
                         }
                         if (item.assignedToUserName.isNotBlank()) {
                             DetailRow(label = "Assigned To", value = item.assignedToUserName)

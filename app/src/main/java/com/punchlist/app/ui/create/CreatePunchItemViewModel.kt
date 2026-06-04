@@ -20,7 +20,8 @@ data class CreatePunchItemUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val createdItemId: String? = null,
-    val localPhotoUris: List<Uri> = emptyList()
+    val localPhotoUris: List<Uri> = emptyList(),
+    val sku: String = ""
 )
 
 @HiltViewModel
@@ -47,6 +48,20 @@ class CreatePunchItemViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    // Watch for SKU value passed back from BarcodeScannerScreen via SavedStateHandle
+    fun observeScannedSku() {
+        savedStateHandle.getLiveData<String>("scanned_sku").observeForever { sku ->
+            if (sku != null) {
+                _uiState.value = _uiState.value.copy(sku = sku)
+                savedStateHandle.remove<String>("scanned_sku")
+            }
+        }
+    }
+
+    fun setSku(value: String) {
+        _uiState.value = _uiState.value.copy(sku = value)
     }
 
     fun removePhoto(uri: Uri) {
@@ -82,7 +97,8 @@ class CreatePunchItemViewModel @Inject constructor(
                 assignedToUserName = assignedToUserName,
                 createdByUserId = uid,
                 createdByUserName = displayName,
-                localPhotoUris = _uiState.value.localPhotoUris
+                localPhotoUris = _uiState.value.localPhotoUris,
+                sku = _uiState.value.sku
             )) {
                 is Result.Success -> _uiState.value = CreatePunchItemUiState(createdItemId = result.data)
                 is Result.Error -> _uiState.value = _uiState.value.copy(isLoading = false, error = result.message)

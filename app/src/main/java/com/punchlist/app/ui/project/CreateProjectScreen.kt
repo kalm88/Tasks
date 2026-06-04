@@ -15,7 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateProjectScreen(
-    onProjectCreated: (String) -> Unit,
+    onProjectCreated: (projectId: String, projectName: String) -> Unit,
     onBack: () -> Unit,
     viewModel: CreateProjectViewModel = hiltViewModel()
 ) {
@@ -25,7 +25,7 @@ fun CreateProjectScreen(
     var description by remember { mutableStateOf("") }
 
     LaunchedEffect(uiState.createdProjectId) {
-        uiState.createdProjectId?.let { onProjectCreated(it) }
+        uiState.createdProjectId?.let { onProjectCreated(it, uiState.createdProjectName) }
     }
 
     Scaffold(

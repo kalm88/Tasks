@@ -21,6 +21,7 @@ junitExt = "1.2.1"
 espresso = "3.6.1"
 mockk = "1.13.11"
 turbine = "1.1.0"
+mlkitBarcode = "17.3.0"
 
 [libraries]
 # Compose BOM
@@ -93,6 +94,9 @@ espresso = { group = "androidx.test.espresso", name = "espresso-core", version.r
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+
+# ML Kit — barcode scanning (works offline, no Firebase dependency required)
+mlkit-barcode = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

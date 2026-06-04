@@ -5,8 +5,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,6 +24,7 @@ fun CreatePunchItemScreen(
     projectId: String,
     onItemCreated: () -> Unit,
     onOpenCamera: () -> Unit,
+    onOpenScanner: () -> Unit,
     onBack: () -> Unit,
     viewModel: CreatePunchItemViewModel = hiltViewModel()
 ) {
@@ -36,6 +39,7 @@ fun CreatePunchItemScreen(
 
     LaunchedEffect(Unit) {
         viewModel.observeCapturedPhoto()
+        viewModel.observeScannedSku()
     }
 
     LaunchedEffect(uiState.createdItemId) {
@@ -108,6 +112,32 @@ fun CreatePunchItemScreen(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            // SKU field with barcode scan button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = uiState.sku,
+                    onValueChange = { viewModel.setSku(it) },
+                    label = { Text("SKU / Barcode") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text("Enter or scan SKU") }
+                )
+                FilledTonalIconButton(
+                    onClick = onOpenScanner,
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Icon(
+                        Icons.Default.QrCodeScanner,
+                        contentDescription = "Scan barcode",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
 
             // Priority dropdown
             ExposedDropdownMenuBox(
