@@ -1,0 +1,17 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# NEVER commit google-services.json — it contains Firebase API keys
+app/google-services.json
+
+# Keystore files
+*.jks
+*.keystore

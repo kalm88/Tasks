@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PunchlistApp" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash screen theme — references the windowSplashScreenAnimatedIcon -->
+    <style name="Theme.PunchlistApp.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primary</item>
+        <item name="postSplashScreenTheme">@style/Theme.PunchlistApp</item>
+    </style>
+</resources>

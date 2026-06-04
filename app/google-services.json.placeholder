@@ -1,0 +1,11 @@
+{
+  "_comment": "REPLACE THIS FILE: Download the real google-services.json from your Firebase Console.",
+  "_steps": [
+    "1. Go to https://console.firebase.google.com",
+    "2. Create a project (or use an existing one)",
+    "3. Add an Android app with package name: com.punchlist.app",
+    "4. Download google-services.json",
+    "5. Rename it from google-services.json.placeholder to google-services.json",
+    "6. Enable Firebase Auth (Email/Password), Firestore, and Storage in the console"
+  ]
+}

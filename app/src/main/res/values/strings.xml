@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Punchlist</string>
+
+    <!-- Auth -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="name">Name</string>
+    <string name="no_account">Don\'t have an account? Sign Up</string>
+    <string name="have_account">Already have an account? Sign In</string>
+
+    <!-- Projects -->
+    <string name="projects">Projects</string>
+    <string name="create_project">Create Project</string>
+    <string name="project_name">Project Name</string>
+    <string name="project_description">Description (optional)</string>
+    <string name="no_projects">No projects yet. Tap + to create one.</string>
+
+    <!-- Punchlist -->
+    <string name="new_issue">+ New Issue</string>
+    <string name="punchlist">Punchlist</string>
+    <string name="no_items">No items yet. Tap the button below to add one.</string>
+    <string name="title">Title</string>
+    <string name="issue_description">Issue Description</string>
+    <string name="work_required">Work Required</string>
+    <string name="location">Location / Area</string>
+    <string name="priority">Priority</string>
+    <string name="status">Status</string>
+    <string name="assigned_to">Assigned To</string>
+    <string name="due_date">Due Date</string>
+    <string name="add_photo">Add Photo</string>
+    <string name="submit">Submit</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="mark_complete">Mark Complete</string>
+    <string name="add_completion_photo">Add Completion Photo</string>
+
+    <!-- Comments -->
+    <string name="comments">Comments</string>
+    <string name="add_comment">Add a comment…</string>
+    <string name="send">Send</string>
+
+    <!-- Filters -->
+    <string name="filter">Filter</string>
+    <string name="search">Search issues…</string>
+    <string name="all">All</string>
+    <string name="clear_filters">Clear Filters</string>
+
+    <!-- Status labels -->
+    <string name="status_open">Open</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_needs_review">Needs Review</string>
+    <string name="status_complete">Complete</string>
+
+    <!-- Priority labels -->
+    <string name="priority_low">Low</string>
+    <string name="priority_medium">Medium</string>
+    <string name="priority_high">High</string>
+    <string name="priority_urgent">Urgent</string>
+
+    <!-- Errors -->
+    <string name="error_empty_email">Email is required</string>
+    <string name="error_empty_password">Password is required</string>
+    <string name="error_empty_title">Title is required</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">No internet connection</string>
+</resources>
