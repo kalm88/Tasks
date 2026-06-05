@@ -16,11 +16,7 @@ public static class MauiProgram
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
             .UseBarcodeReader()
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-            });
+            .ConfigureFonts(fonts => { });
 
         // ── HTTP (shared client for all Firebase REST calls) ───────────────
         builder.Services.AddSingleton<HttpClient>();
