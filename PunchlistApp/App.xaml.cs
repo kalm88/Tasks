@@ -5,19 +5,24 @@ namespace PunchlistApp;
 public partial class App : Application
 {
     private readonly IAuthService _auth;
-    private readonly AppShell _shell;
+    private readonly IServiceProvider _sp;
 
-    public App(IAuthService auth, AppShell shell)
+    public App(IAuthService auth, IServiceProvider sp)
     {
+        // InitializeComponent merges App.xaml resources BEFORE AppShell is created,
+        // so StaticResource lookups in AppShell.xaml and all pages succeed.
         InitializeComponent();
         _auth = auth;
-        _shell = shell;
+        _sp = sp;
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        // Navigate to the right starting page once the window/shell is live
-        _shell.Dispatcher.Dispatch(async () =>
+        // AppShell is resolved here — after resources are loaded — so XAML
+        // StaticResource bindings in the shell and all navigated pages work.
+        var shell = _sp.GetRequiredService<AppShell>();
+
+        shell.Dispatcher.Dispatch(async () =>
         {
             if (!_auth.IsLoggedIn)
                 await Shell.Current.GoToAsync("//login");
@@ -25,6 +30,6 @@ public partial class App : Application
                 await Shell.Current.GoToAsync("//projects");
         });
 
-        return new Window(_shell);
+        return new Window(shell);
     }
 }
