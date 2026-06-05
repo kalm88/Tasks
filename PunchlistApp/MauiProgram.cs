@@ -1,9 +1,5 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using Plugin.Firebase.Auth;
-using Plugin.Firebase.CloudFirestore;
-using Plugin.Firebase.Storage;
-using PunchlistApp.Converters;
 using PunchlistApp.Services;
 using PunchlistApp.ViewModels;
 using PunchlistApp.Views;
@@ -26,17 +22,13 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        // ── Firebase ───────────────────────────────────────────────────────
-        // Add google-services.json (Android) and GoogleService-Info.plist (iOS)
-        // to the Platforms/Android and Platforms/iOS folders before building.
-        builder.Services.AddSingleton(_ => CrossFirebaseAuth.Current);
-        builder.Services.AddSingleton(_ => CrossFirebaseFirestore.Current);
-        builder.Services.AddSingleton(_ => CrossFirebaseStorage.Current);
+        // ── HTTP (shared client for all Firebase REST calls) ───────────────
+        builder.Services.AddSingleton<HttpClient>();
 
-        // ── App Services ───────────────────────────────────────────────────
-        builder.Services.AddSingleton<IFirestoreService, FirestoreService>();
-        builder.Services.AddSingleton<IStorageService, FirebaseStorageService>();
-        builder.Services.AddSingleton<IAuthService, FirebaseAuthService>();
+        // ── Services ───────────────────────────────────────────────────────
+        builder.Services.AddSingleton<IAuthService, AuthRestService>();
+        builder.Services.AddSingleton<IFirestoreService, FirestoreRestService>();
+        builder.Services.AddSingleton<IStorageService, StorageRestService>();
         builder.Services.AddSingleton<PrintShareService>();
 
         // ── ViewModels ─────────────────────────────────────────────────────
@@ -59,11 +51,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PunchItemDetailPage>();
         builder.Services.AddTransient<BarcodeScannerPage>();
 
-        // Shell
         builder.Services.AddSingleton<AppShell>();
-
-        // ── Converters (app-level resource) ───────────────────────────────
-        // Converters are declared in App.xaml resources
 
 #if DEBUG
         builder.Logging.AddDebug();

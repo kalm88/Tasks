@@ -25,12 +25,12 @@ public partial class CreatePunchItemViewModel : BaseViewModel
 
     public List<Priority> Priorities { get; } = [Priority.Low, Priority.Medium, Priority.High, Priority.Urgent];
 
-    partial void OnScannedSkuChanged(string value)
+    [ObservableProperty] private string? _scannedSku;
+
+    partial void OnScannedSkuChanged(string? value)
     {
         if (!string.IsNullOrEmpty(value)) Sku = value;
     }
-
-    public string? ScannedSku { get; set; }
 
     public CreatePunchItemViewModel(IFirestoreService firestore, IStorageService storage, IAuthService auth)
     {
