@@ -23,8 +23,10 @@ public class FirestoreService : IFirestoreService
 
     public async Task<User?> GetUserAsync(string userId)
     {
-        var snap = await _db.GetCollection("users").GetDocument(userId).GetDocumentSnapshotAsync<Dictionary<string, object>>();
-        return snap.Exists ? DictToUser(userId, snap.Data!) : null;
+        var snap = await _db.GetCollection("users")
+                            .GetDocument(userId)
+                            .GetDocumentSnapshotAsync<IDictionary<object, object>>();
+        return snap.IsExistent ? DictToUser(userId, snap.Object!) : null;
     }
 
     // ── Projects ───────────────────────────────────────────────────────────
@@ -36,7 +38,7 @@ public class FirestoreService : IFirestoreService
         await docRef.SetDataAsync(ProjectToDict(project));
         await docRef.GetCollection("members")
                     .GetDocument(project.CreatedByUserId)
-                    .SetDataAsync(new Dictionary<string, object> { ["role"] = "admin" });
+                    .SetDataAsync(new Dictionary<object, object> { ["role"] = "admin" });
         return docRef.Id;
     }
 
@@ -44,9 +46,9 @@ public class FirestoreService : IFirestoreService
     {
         var snaps = await _db.GetCollection("projects")
                              .WhereEqualsTo("createdByUserId", userId)
-                             .OrderByDescending("createdAt")
-                             .GetDocumentSnapshotsAsync<Dictionary<string, object>>();
-        return snaps.Select(s => DictToProject(s.Id, s.Data!)).ToList();
+                             .OrderedByDescending("createdAt")
+                             .GetDocumentSnapshotsAsync<IDictionary<object, object>>();
+        return snaps.Select(s => DictToProject(s.Id, s.Object!)).ToList();
     }
 
     // ── PunchItems ─────────────────────────────────────────────────────────
@@ -76,9 +78,9 @@ public class FirestoreService : IFirestoreService
         var snaps = await _db.GetCollection("projects")
                              .GetDocument(projectId)
                              .GetCollection("punchItems")
-                             .OrderByDescending("createdAt")
-                             .GetDocumentSnapshotsAsync<Dictionary<string, object>>();
-        return snaps.Select(s => DictToPunchItem(s.Id, projectId, s.Data!)).ToList();
+                             .OrderedByDescending("createdAt")
+                             .GetDocumentSnapshotsAsync<IDictionary<object, object>>();
+        return snaps.Select(s => DictToPunchItem(s.Id, projectId, s.Object!)).ToList();
     }
 
     public async Task<PunchItem?> GetPunchItemAsync(string projectId, string itemId)
@@ -87,8 +89,8 @@ public class FirestoreService : IFirestoreService
                             .GetDocument(projectId)
                             .GetCollection("punchItems")
                             .GetDocument(itemId)
-                            .GetDocumentSnapshotAsync<Dictionary<string, object>>();
-        return snap.Exists ? DictToPunchItem(itemId, projectId, snap.Data!) : null;
+                            .GetDocumentSnapshotAsync<IDictionary<object, object>>();
+        return snap.IsExistent ? DictToPunchItem(itemId, projectId, snap.Object!) : null;
     }
 
     public async Task UpdatePunchItemStatusAsync(string projectId, string itemId, Status status)
@@ -97,7 +99,7 @@ public class FirestoreService : IFirestoreService
                  .GetDocument(projectId)
                  .GetCollection("punchItems")
                  .GetDocument(itemId)
-                 .UpdateDataAsync(new Dictionary<string, object>
+                 .UpdateDataAsync(new Dictionary<object, object>
                  {
                      ["status"] = status.ToString(),
                      ["updatedAt"] = DateTime.UtcNow
@@ -109,7 +111,7 @@ public class FirestoreService : IFirestoreService
     public async Task<string> AddCommentAsync(Comment comment)
     {
         var docRef = _db.GetCollection("projects")
-                        .GetDocument(comment.ItemId.Split('/')[0])
+                        .GetDocument(comment.ProjectId)
                         .GetCollection("punchItems")
                         .GetDocument(comment.ItemId)
                         .GetCollection("comments")
@@ -126,40 +128,40 @@ public class FirestoreService : IFirestoreService
                              .GetCollection("punchItems")
                              .GetDocument(itemId)
                              .GetCollection("comments")
-                             .OrderByAscending("createdAt")
-                             .GetDocumentSnapshotsAsync<Dictionary<string, object>>();
-        return snaps.Select(s => DictToComment(s.Id, itemId, s.Data!)).ToList();
+                             .OrderedByAscending("createdAt")
+                             .GetDocumentSnapshotsAsync<IDictionary<object, object>>();
+        return snaps.Select(s => DictToComment(s.Id, projectId, itemId, s.Object!)).ToList();
     }
 
     // ── Mapping helpers ────────────────────────────────────────────────────
 
-    private static Dictionary<string, object> UserToDict(User u) => new()
+    private static Dictionary<object, object> UserToDict(User u) => new()
     {
         ["id"] = u.Id, ["email"] = u.Email, ["displayName"] = u.DisplayName,
         ["role"] = u.Role.ToString(), ["createdAt"] = u.CreatedAt
     };
 
-    private static User DictToUser(string id, Dictionary<string, object> d) => new()
+    private static User DictToUser(string id, IDictionary<object, object> d) => new()
     {
         Id = id, Email = d.GetStr("email"), DisplayName = d.GetStr("displayName"),
         Role = Enum.TryParse<Role>(d.GetStr("role"), out var r) ? r : Role.Worker
     };
 
-    private static Dictionary<string, object> ProjectToDict(Project p) => new()
+    private static Dictionary<object, object> ProjectToDict(Project p) => new()
     {
         ["id"] = p.Id, ["name"] = p.Name, ["description"] = p.Description,
         ["createdByUserId"] = p.CreatedByUserId, ["createdAt"] = p.CreatedAt,
         ["memberCount"] = p.MemberCount
     };
 
-    private static Project DictToProject(string id, Dictionary<string, object> d) => new()
+    private static Project DictToProject(string id, IDictionary<object, object> d) => new()
     {
         Id = id, Name = d.GetStr("name"), Description = d.GetStr("description"),
         CreatedByUserId = d.GetStr("createdByUserId"),
         CreatedAt = d.GetDate("createdAt"), MemberCount = d.GetInt("memberCount", 1)
     };
 
-    private static Dictionary<string, object> PunchItemToDict(PunchItem i) => new()
+    private static Dictionary<object, object> PunchItemToDict(PunchItem i) => new()
     {
         ["id"] = i.Id, ["projectId"] = i.ProjectId, ["title"] = i.Title,
         ["issueDescription"] = i.IssueDescription, ["workRequired"] = i.WorkRequired,
@@ -172,7 +174,7 @@ public class FirestoreService : IFirestoreService
         ["sku"] = i.Sku
     };
 
-    private static PunchItem DictToPunchItem(string id, string projectId, Dictionary<string, object> d) => new()
+    private static PunchItem DictToPunchItem(string id, string projectId, IDictionary<object, object> d) => new()
     {
         Id = id, ProjectId = projectId, Title = d.GetStr("title"),
         IssueDescription = d.GetStr("issueDescription"), WorkRequired = d.GetStr("workRequired"),
@@ -186,32 +188,33 @@ public class FirestoreService : IFirestoreService
         CommentCount = d.GetInt("commentCount"), Sku = d.GetStr("sku")
     };
 
-    private static Dictionary<string, object> CommentToDict(Comment c) => new()
+    private static Dictionary<object, object> CommentToDict(Comment c) => new()
     {
-        ["id"] = c.Id, ["itemId"] = c.ItemId, ["userId"] = c.UserId,
-        ["userName"] = c.UserName, ["text"] = c.Text, ["createdAt"] = c.CreatedAt,
-        ["photoUrl"] = c.PhotoUrl
+        ["id"] = c.Id, ["projectId"] = c.ProjectId, ["itemId"] = c.ItemId,
+        ["userId"] = c.UserId, ["userName"] = c.UserName, ["text"] = c.Text,
+        ["createdAt"] = c.CreatedAt, ["photoUrl"] = c.PhotoUrl
     };
 
-    private static Comment DictToComment(string id, string itemId, Dictionary<string, object> d) => new()
+    private static Comment DictToComment(string id, string projectId, string itemId, IDictionary<object, object> d) => new()
     {
-        Id = id, ItemId = itemId, UserId = d.GetStr("userId"), UserName = d.GetStr("userName"),
+        Id = id, ProjectId = projectId, ItemId = itemId,
+        UserId = d.GetStr("userId"), UserName = d.GetStr("userName"),
         Text = d.GetStr("text"), CreatedAt = d.GetDate("createdAt"), PhotoUrl = d.GetStr("photoUrl")
     };
 }
 
 internal static class DictExtensions
 {
-    public static string GetStr(this Dictionary<string, object> d, string key) =>
+    public static string GetStr(this IDictionary<object, object> d, string key) =>
         d.TryGetValue(key, out var v) ? v?.ToString() ?? "" : "";
 
-    public static int GetInt(this Dictionary<string, object> d, string key, int def = 0) =>
+    public static int GetInt(this IDictionary<object, object> d, string key, int def = 0) =>
         d.TryGetValue(key, out var v) && int.TryParse(v?.ToString(), out var i) ? i : def;
 
-    public static DateTime GetDate(this Dictionary<string, object> d, string key) =>
+    public static DateTime GetDate(this IDictionary<object, object> d, string key) =>
         d.TryGetValue(key, out var v) && v is DateTime dt ? dt : DateTime.UtcNow;
 
-    public static List<string> GetStrList(this Dictionary<string, object> d, string key) =>
+    public static List<string> GetStrList(this IDictionary<object, object> d, string key) =>
         d.TryGetValue(key, out var v) && v is IEnumerable<object> list
             ? list.Select(x => x?.ToString() ?? "").ToList()
             : [];

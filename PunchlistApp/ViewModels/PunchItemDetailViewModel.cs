@@ -71,6 +71,7 @@ public partial class PunchItemDetailViewModel : BaseViewModel
         {
             var comment = new Comment
             {
+                ProjectId = ProjectId,
                 ItemId = ItemId,
                 Text = NewCommentText.Trim(),
                 CreatedAt = DateTime.UtcNow
