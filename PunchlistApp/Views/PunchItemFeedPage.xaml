@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PunchlistApp.ViewModels"
+             xmlns:models="clr-namespace:PunchlistApp.Models"
+             x:Class="PunchlistApp.Views.PunchItemFeedPage"
+             x:DataType="vm:PunchItemFeedViewModel"
+             Title="{Binding ProjectName}"
+             BackgroundColor="{StaticResource BackgroundColor}">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <RefreshView Grid.Row="0"
+                     Command="{Binding LoadCommand}"
+                     IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding Items}"
+                            SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12" Margin="32">
+                        <Label Text="No items yet" Style="{StaticResource HeadlineLabel}" HorizontalOptions="Center" />
+                        <Label Text="Tap + to add the first punchlist item" Style="{StaticResource SubtitleLabel}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:PunchItem">
+                        <Frame Style="{StaticResource CardFrame}" Margin="16,8,16,0">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PunchItemFeedViewModel}}, Path=OpenItemCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6">
+
+                                <!-- Title -->
+                                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Text="{Binding Title}"
+                                       FontSize="16" FontAttributes="Bold"
+                                       TextColor="{StaticResource OnSurface}" />
+
+                                <!-- Status + Priority pills -->
+                                <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="8">
+                                    <Frame BackgroundColor="{Binding Status, Converter={StaticResource StatusToColor}}"
+                                           CornerRadius="10" Padding="8,4" HasShadow="False" BorderColor="Transparent">
+                                        <Label Text="{Binding Status, Converter={StaticResource StatusToLabel}}"
+                                               Style="{StaticResource PillLabel}" />
+                                    </Frame>
+                                    <Frame BackgroundColor="{Binding Priority, Converter={StaticResource PriorityToColor}}"
+                                           CornerRadius="10" Padding="8,4" HasShadow="False" BorderColor="Transparent">
+                                        <Label Text="{Binding Priority, Converter={StaticResource PriorityToLabel}}"
+                                               Style="{StaticResource PillLabel}" />
+                                    </Frame>
+                                </HorizontalStackLayout>
+
+                                <!-- Meta -->
+                                <VerticalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="2">
+                                    <Label Text="{Binding Location}" Style="{StaticResource SubtitleLabel}"
+                                           IsVisible="{Binding Location, Converter={StaticResource BoolToVisibility}}" />
+                                    <Label Text="{Binding AssignedToUserName, StringFormat='Assigned: {0}'}"
+                                           Style="{StaticResource SubtitleLabel}" FontSize="12"
+                                           IsVisible="{Binding AssignedToUserName, Converter={StaticResource BoolToVisibility}}" />
+                                </VerticalStackLayout>
+
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- FAB -->
+        <Button Grid.Row="1"
+                Text="+ Add Item"
+                Command="{Binding CreateItemCommand}"
+                Style="{StaticResource PrimaryButton}"
+                Margin="16"
+                HorizontalOptions="Fill" />
+
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PunchlistApp.ViewModels"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="PunchlistApp.Views.BarcodeScannerPage"
+             x:DataType="vm:BarcodeScannerViewModel"
+             Title="Scan Barcode"
+             BackgroundColor="Black">
+
+    <Grid>
+
+        <!-- Camera preview -->
+        <zxing:CameraBarcodeReaderView x:Name="BarcodeReader"
+                                        IsDetecting="{Binding IsScanning}"
+                                        BarcodesDetected="OnBarcodesDetected"
+                                        HorizontalOptions="Fill"
+                                        VerticalOptions="Fill" />
+
+        <!-- Reticle overlay -->
+        <Frame WidthRequest="260"
+               HeightRequest="160"
+               CornerRadius="12"
+               BackgroundColor="Transparent"
+               BorderColor="White"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
+
+        <!-- Hint -->
+        <Label Text="Point camera at barcode"
+               TextColor="White"
+               FontSize="16"
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Margin="0,0,0,80"
+               Opacity="0.85" />
+
+        <!-- Success indicator -->
+        <Frame BackgroundColor="#CC4CAF50"
+               CornerRadius="8"
+               Padding="16,8"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               IsVisible="{Binding IsScanning, Converter={StaticResource InverseBool}}">
+            <Label Text="{Binding ScannedValue, StringFormat='✓ {0}'}"
+                   TextColor="White" FontAttributes="Bold" FontSize="16" />
+        </Frame>
+
+    </Grid>
+
+</ContentPage>

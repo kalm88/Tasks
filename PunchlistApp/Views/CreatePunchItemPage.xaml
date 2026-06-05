@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PunchlistApp.ViewModels"
+             xmlns:models="clr-namespace:PunchlistApp.Models"
+             x:Class="PunchlistApp.Views.CreatePunchItemPage"
+             x:DataType="vm:CreatePunchItemViewModel"
+             Title="New Item"
+             BackgroundColor="{StaticResource BackgroundColor}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="0">
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="{StaticResource ErrorColor}"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource BoolToVisibility}}"
+                   Margin="0,0,0,12" FontSize="13" />
+
+            <!-- Title -->
+            <Label Text="TITLE *" Style="{StaticResource SectionLabel}" Margin="0,0,0,4" />
+            <Frame Padding="0" CornerRadius="8" BorderColor="{StaticResource DividerColor}" HasShadow="False" Margin="0,0,0,16">
+                <Entry Text="{Binding Title}" Placeholder="Brief issue title"
+                       Style="{StaticResource TextEntry}" Margin="12,0" />
+            </Frame>
+
+            <!-- Issue Description -->
+            <Label Text="ISSUE DESCRIPTION" Style="{StaticResource SectionLabel}" Margin="0,0,0,4" />
+            <Frame Padding="0" CornerRadius="8" BorderColor="{StaticResource DividerColor}" HasShadow="False" Margin="0,0,0,16">
+                <Editor Text="{Binding IssueDescription}" Placeholder="Describe what's wrong..."
+                        AutoSize="TextChanges" MinimumHeightRequest="80"
+                        Style="{StaticResource TextEditor}" Margin="12,8" />
+            </Frame>
+
+            <!-- Work Required -->
+            <Label Text="WORK REQUIRED" Style="{StaticResource SectionLabel}" Margin="0,0,0,4" />
+            <Frame Padding="0" CornerRadius="8" BorderColor="{StaticResource DividerColor}" HasShadow="False" Margin="0,0,0,16">
+                <Editor Text="{Binding WorkRequired}" Placeholder="Describe the fix needed..."
+                        AutoSize="TextChanges" MinimumHeightRequest="60"
+                        Style="{StaticResource TextEditor}" Margin="12,8" />
+            </Frame>
+
+            <!-- Location -->
+            <Label Text="LOCATION" Style="{StaticResource SectionLabel}" Margin="0,0,0,4" />
+            <Frame Padding="0" CornerRadius="8" BorderColor="{StaticResource DividerColor}" HasShadow="False" Margin="0,0,0,16">
+                <Entry Text="{Binding Location}" Placeholder="e.g. North wall, Room 4B"
+                       Style="{StaticResource TextEntry}" Margin="12,0" />
+            </Frame>
+
+            <!-- SKU with scan button -->
+            <Label Text="SKU / BARCODE" Style="{StaticResource SectionLabel}" Margin="0,0,0,4" />
+            <Grid ColumnDefinitions="*,56" ColumnSpacing="8" Margin="0,0,0,16">
+                <Frame Grid.Column="0" Padding="0" CornerRadius="8" BorderColor="{StaticResource DividerColor}" HasShadow="False">
+                    <Entry Text="{Binding Sku}" Placeholder="Scan or type SKU"
+                           Style="{StaticResource TextEntry}" Margin="12,0" />
+                </Frame>
+                <Button Grid.Column="1"
+                        Text="⬛"
+                        Command="{Binding ScanBarcodeCommand}"
+                        BackgroundColor="{StaticResource PrimaryColor}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="52"
+                        WidthRequest="56"
+                        FontSize="20" />
+            </Grid>
+
+            <!-- Priority picker -->
+            <Label Text="PRIORITY" Style="{StaticResource SectionLabel}" Margin="0,0,0,4" />
+            <Frame Padding="0" CornerRadius="8" BorderColor="{StaticResource DividerColor}" HasShadow="False" Margin="0,0,0,16">
+                <Picker ItemsSource="{Binding Priorities}"
+                        SelectedItem="{Binding SelectedPriority}"
+                        Title="Select priority"
+                        Margin="12,0" />
+            </Frame>
+
+            <!-- Photo -->
+            <Label Text="PHOTOS" Style="{StaticResource SectionLabel}" Margin="0,0,0,4" />
+            <Button Text="📷 Take Photo"
+                    Command="{Binding TakePhotoCommand}"
+                    Style="{StaticResource SecondaryButton}"
+                    Margin="0,0,0,8" />
+            <CollectionView ItemsSource="{Binding LocalPhotoUris}"
+                            ItemsLayout="HorizontalList"
+                            HeightRequest="80"
+                            Margin="0,0,0,24"
+                            IsVisible="{Binding LocalPhotoUris.Count, Converter={StaticResource BoolToVisibility}}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Image Source="{Binding .}" WidthRequest="72" HeightRequest="72"
+                               Aspect="AspectFill" Margin="0,0,8,0">
+                            <Image.Clip>
+                                <RoundRectangleGeometry Rect="0,0,72,72" CornerRadius="8" />
+                            </Image.Clip>
+                        </Image>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Save -->
+            <Button Text="Save Item"
+                    Command="{Binding SaveCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"
+                    Margin="0,0,0,8" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource PrimaryColor}"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,32" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

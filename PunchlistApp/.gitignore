@@ -1,0 +1,12 @@
+# Firebase config — add these manually; never commit secrets
+Platforms/Android/google-services.json
+Platforms/iOS/GoogleService-Info.plist
+
+# Build output
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userprefs
+.DS_Store
