@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.kapt)
+    kotlin("kapt")  // kapt is already on the classpath via kotlin.android — no version needed
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.services)
 }
