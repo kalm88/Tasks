@@ -13,7 +13,7 @@ public partial class BarcodeScannerPage : ContentPage
         BindingContext = _vm = vm;
         BarcodeReader.Options = new BarcodeReaderOptions
         {
-            Formats = BarcodeFormat.All,
+            Formats = BarcodeFormats.All,
             AutoRotate = true,
             Multiple = false
         };

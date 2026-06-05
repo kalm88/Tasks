@@ -4,19 +4,27 @@ namespace PunchlistApp;
 
 public partial class App : Application
 {
+    private readonly IAuthService _auth;
+    private readonly AppShell _shell;
+
     public App(IAuthService auth, AppShell shell)
     {
         InitializeComponent();
-        MainPage = shell;
+        _auth = auth;
+        _shell = shell;
+    }
 
-        // Route to login if not signed in
-        if (!auth.IsLoggedIn)
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        // Navigate to the right starting page once the window/shell is live
+        _shell.Dispatcher.Dispatch(async () =>
         {
-            Shell.Current.GoToAsync("//login");
-        }
-        else
-        {
-            Shell.Current.GoToAsync("//projects");
-        }
+            if (!_auth.IsLoggedIn)
+                await Shell.Current.GoToAsync("//login");
+            else
+                await Shell.Current.GoToAsync("//projects");
+        });
+
+        return new Window(_shell);
     }
 }

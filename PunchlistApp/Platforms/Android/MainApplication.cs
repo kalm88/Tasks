@@ -1,6 +1,5 @@
 using Android.App;
 using Android.Runtime;
-using Plugin.Firebase.Core.Platforms.Android;
 
 namespace PunchlistApp.Platforms.Android;
 
@@ -13,10 +12,4 @@ public class MainApplication : MauiApplication
     }
 
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
-
-    public override void OnCreate()
-    {
-        base.OnCreate();
-        FirebaseApp.InitializeApp(this);
-    }
 }
